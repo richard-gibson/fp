@@ -4,7 +4,6 @@ import arrow.core.Try
 import arrow.effects.IO
 import arrow.effects.fix
 import arrow.effects.instances.io.monad.monad
-import arrow.typeclasses.binding
 import java.util.*
 
 

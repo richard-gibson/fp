@@ -46,7 +46,7 @@ data class Optional<S, A>(
 
     fun <B> compose(that: Prism<A, B>): Optional<S, B> = TODO()
 
-//    fun <B> compose(that: Traversal<A, B>): Traversal<S, B> = TODO()
+//    fun <B> compose(that: Traversal<A, B>): Traversal<s, B> = TODO()
 
 }
 

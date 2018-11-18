@@ -1,4 +1,13 @@
 import arrow.core.*
+import arrow.effects.DeferredK
+import arrow.effects.asyncK
+import arrow.effects.deferredk.applicative.applicative
+import arrow.effects.fix
+import arrow.effects.unsafeRunSync
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import java.lang.Thread.sleep
 
 /*
 fun <A, B, C> Tuple2<Tuple2<A, B>, C>.flatten(): Tuple3<A, B, C> = Tuple3(a.a, a.b, b)
@@ -17,9 +26,9 @@ fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> Tuple2<Tuple2<Tuple2<Tuple2<Tu
 fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>.flatten(): Tuple16<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> = Tuple16(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
 fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>.flatten(): Tuple17<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> = Tuple17(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
 fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>.flatten(): Tuple18<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> = Tuple18(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
-fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, S>.flatten(): Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> = Tuple19(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
-fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, S>, T>.flatten(): Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> = Tuple20(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
-fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, S>, T>, U>.flatten(): Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> = Tuple21(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
+fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, s>.flatten(): Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s> = Tuple19(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
+fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s, T> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, s>, T>.flatten(): Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s, T> = Tuple20(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
+fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s, T, U> Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<Tuple2<A, B>, C>, D>, E>, F>, G>, H>, I>, J>, K>, L>, M>, N>, O>, P>, Q>, R>, s>, T>, U>.flatten(): Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, s, T, U> = Tuple21(a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.a.b, a.a.a.a.a.a.a.b, a.a.a.a.a.a.b, a.a.a.a.a.b, a.a.a.a.b, a.a.a.b, a.a.b, a.b, b)
 */
 
 val availableLetters = ('a'..'z').toList().map { it.toString() }
@@ -59,11 +68,10 @@ fun buildDeps(depTree: List<Node>, resolvedDeps: List<Node> = emptyList(), lastR
 }
 
 
-
-fun main(s: Array<String>) {
+/*fun main(s: Array<String>) {
     println(buildDeps(depTree))
     println(listOf(1,2,3,4,5) + listOf(6,7,8,9))
-}
+}*/
 /*
 ([Root(name=f),
 Root(name=c),
@@ -94,3 +102,25 @@ Child(name=a, dependsOn=[b, c, d])], [Child(name=g, dependsOn=[h]), Child(name=h
     }*/
 
 //    val t = (1 toT "foo" toT true toT 54 toT "Adsff " toT 0).flatten()
+
+fun DeferredK.Companion.sleep(milis: Long, scope: CoroutineScope = GlobalScope): DeferredK<Unit> =
+        scope.asyncK {
+            delay(milis)
+        }
+
+fun slowInc(i: Int): DeferredK<Int> =
+        DeferredK.async {
+            println("recieved $i")
+            sleep(500)
+            val inc = i + 1
+            println("processing $inc")
+            inc
+        }
+
+fun main(args: Array<String>) {
+    val t = DeferredK.applicative()
+            .tupled(slowInc(1), slowInc(2), slowInc(3))
+            .fix()
+
+    t.unsafeRunSync()
+}
