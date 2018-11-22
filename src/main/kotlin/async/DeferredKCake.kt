@@ -4,6 +4,7 @@ import arrow.core.Tuple3
 import arrow.data.k
 import arrow.effects.*
 import arrow.effects.deferredk.monad.binding
+
 import arrow.effects.DeferredK.Companion.raiseError
 import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.deferredk.monad.monad

@@ -1,21 +1,17 @@
 package intro
 
-import arrow.core.compose
-import arrow.instances.list.foldable.foldLeft
-import collections.andThen
 
 
-object util {
-    infix fun <A, B, C> ((B) -> C).compose(f: (A) -> B): (A) -> C =
-            { a -> this(f(a)) }
+infix fun <A, B, C> ((B) -> C).compose(f: (A) -> B): (A) -> C =
+        { a -> this(f(a)) }
 
-    infix fun <A, B, C> ((A) -> B).andThen(f: (B) -> C): (A) -> C =
-            { a -> f(this(a)) }
-}
+infix fun <A, B, C> ((A) -> B).andThen(f: (B) -> C): (A) -> C =
+        { a -> f(this(a)) }
+
 
 object Functions {
 
-    //Higher order funcions
+    //Higher order functions
 
     val listInts : List<Int> = listOf(1,2,3,4,5,6).map{x ->  x + 1}
 
@@ -83,9 +79,7 @@ object Functions {
 
     val calculator: (List<(Int) -> Int>) -> (Int) -> Int = { cmds ->
         { x ->
-            cmds.foldLeft(x) { acc, elem ->
-                elem(acc)
-            }
+            cmds.fold(x) { acc, elem -> elem(acc) }
         }
     }
 
@@ -94,5 +88,7 @@ object Functions {
 
 
 }
+
+
 
 

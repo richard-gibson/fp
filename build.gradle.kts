@@ -8,6 +8,7 @@ group = "co.instil"
 version = "1.0-SNAPSHOT"
 
 val arrow_version = "0.8.2-SNAPSHOT"
+//val arrow_version = "0.8.1"
 
 repositories {
     mavenCentral()
