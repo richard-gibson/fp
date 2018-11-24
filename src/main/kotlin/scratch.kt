@@ -118,9 +118,10 @@ fun slowInc(i: Int): DeferredK<Int> =
         }
 
 fun main(args: Array<String>) {
-    val t = DeferredK.applicative()
+  /*  val t = DeferredK.applicative()
             .tupled(slowInc(1), slowInc(2), slowInc(3))
             .fix()
 
-    t.unsafeRunSync()
+    t.unsafeRunSync()*/
+
 }

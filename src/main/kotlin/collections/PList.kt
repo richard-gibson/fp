@@ -1,4 +1,7 @@
 package collections
+
+import arrow.core.identity
+
 sealed class PList<out A> {
     abstract fun isEmpty(): Boolean
     abstract fun head(): A
@@ -36,7 +39,7 @@ data class Cons<A>(val head: A, val tail: PList<A>) : PList<A>() {
 }
 
 //ListOps
-fun <A,B> PList<A>.fold(empty: (PList<A>) -> B, notEmpty: (PList<A>) -> B): B =
+fun <A, B> PList<A>.fold(empty: (PList<A>) -> B, notEmpty: (PList<A>) -> B): B =
         when (this) {
             is Nil -> empty(this)
             is Cons -> notEmpty(this)
@@ -54,17 +57,15 @@ fun <A, B> PList<A>.map(f: (A) -> B): PList<B> =
         fold({ Nil }, { Cons(f(head()), tail().map(f)) })
 
 fun <A, B> PList<A>.flatMap(f: (A) -> PList<B>): PList<B> =
-//        map(f).flatten()
-
-//      or more efficiently as 1 pass
-      fold({ Nil }, { f(head()) join tail().flatMap(f) })
+        fold({ Nil }, { f(head()) join tail().flatMap(f) })
 
 
 fun <A, B> PList<A>.foldLeft(acc: B, f: (B, A) -> B): B =
         fold({ acc }, { tail().foldLeft(f(acc, head()), f) })
 
 fun <A> PList<PList<A>>.flatten(): PList<A> =
-        foldLeft(PList.empty()) { acc, e -> acc join e }
+        flatMap(::identity)
+//        fold({ Nil }, { head() join tail().flatten() })
 
 fun <A, B> PList<A>.foldRight(acc: B, f: (B, A) -> B): B =
         fold({ acc }, { f(tail().foldRight(acc, f), head()) })
@@ -100,7 +101,7 @@ fun <A> PList<A>.dropWhile(pred: (A) -> Boolean): PList<A> =
 
 /**
  *
- def splitAt(n: Int): (IList[A], IList[A]) = {
+def splitAt(n: Int): (IList[A], IList[A]) = {
 @tailrec def splitAt0(n: Int, as: IList[A], accum: IList[A]): (IList[A], IList[A]) =
 if (n < 1) (accum.reverse, as) else as match {
 case INil() => (this, empty)
@@ -112,7 +113,7 @@ splitAt0(n, this, empty)
 fun <A> PList<A>.splitAt(i: Int): Pair<PList<A>, PList<A>> {
     fun _splitAt(n: Int, dec: PList<A>, acc: PList<A>) {
         if (n < 1) dec to acc
-        else when(dec) {
+        else when (dec) {
             is Nil -> (this to Nil)
         }
     }

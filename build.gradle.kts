@@ -7,8 +7,11 @@ plugins {
 group = "co.instil"
 version = "1.0-SNAPSHOT"
 
-val arrow_version = "0.8.2-SNAPSHOT"
-//val arrow_version = "0.8.1"
+val arrowVersion = "0.8.2-SNAPSHOT"
+//val arrowVersion = "0.8.1"
+
+
+val kotlintestVersion = "2.0.7"
 
 repositories {
     mavenCentral()
@@ -17,29 +20,34 @@ repositories {
 
 dependencies {
     compile(kotlin("stdlib-jdk8"))
+    compile(kotlin("reflect"))
 
-    compile(group = "io.arrow-kt", name = "arrow-core", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-syntax", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-typeclasses", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-data", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-query-language", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-instances-core", version = arrow_version)
-    compile(group = "io.arrow-kt", name = "arrow-instances-data", version = arrow_version)
-    kapt(group = "io.arrow-kt", name = "arrow-annotations-processor", version = arrow_version)
+    compile(group = "io.arrow-kt", name = "arrow-core",                                 version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-syntax",                               version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-typeclasses",                          version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-data",                                 version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-query-language",                       version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-instances-core",                       version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-instances-data",                       version = arrowVersion)
 
-    compile("io.arrow-kt:arrow-free:$arrow_version")
-    compile("io.arrow-kt:arrow-mtl:$arrow_version")
-    compile("io.arrow-kt:arrow-effects:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-instances:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-rx2:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-rx2-instances:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-reactor:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-reactor-instances:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-kotlinx-coroutines:$arrow_version")
-    compile("io.arrow-kt:arrow-effects-kotlinx-coroutines-instances:$arrow_version")
-    compile("io.arrow-kt:arrow-optics:$arrow_version")
+    compile(group = "io.arrow-kt", name = "arrow-free",                                 version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-mtl",                                  version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects",                              version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-instances",                    version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-rx2",                          version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-rx2-instances",                version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-reactor",                      version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-reactor-instances",            version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-kotlinx-coroutines",           version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-effects-kotlinx-coroutines-instances", version = arrowVersion)
+    compile(group = "io.arrow-kt", name = "arrow-optics",                               version = arrowVersion)
+
+    kapt(group = "io.arrow-kt",    name = "arrow-annotations-processor",                version = arrowVersion)
+
+    testCompile(group = "io.arrow-kt",   name = "arrow-test",                           version = arrowVersion)
+    testCompile(group = "io.kotlintest", name = "kotlintest",                           version = kotlintestVersion)
+
 }
-
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }

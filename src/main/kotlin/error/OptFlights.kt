@@ -19,6 +19,16 @@ object OptFlights {
     fun flightById(flightNo: Int): Option<Flight> =
             flights.firstOrNull { it.flightNo == flightNo }.toOption()
 
+  fun userFlightsFlatMap(name:String): Option<Nel<Flight>> =
+      try {
+        userByName(name)
+            .flatMap{ user -> manifestsContainingUser(user) }
+            .flatMap { manifests -> manifests.map{ flightById(it.flightNo) }.flip() }
+
+      } catch (e: Exception) {
+        println("Something went wrong ${e.message}")
+        throw e
+      }
 
     fun userFlights(name: String): Option<Nel<Flight>> =
             try {
@@ -26,11 +36,14 @@ object OptFlights {
                     val user = userByName(name).bind()
                     val manifests = manifestsContainingUser(user).bind()
                     val optFlights = manifests.map { flightById(it.flightNo) }
-                    optFlights.sequence(Option.applicative()).bind()
+                    optFlights.flip().bind()
                 }
 
             } catch (e: Exception) {
                 println("Something went wrong ${e.message}")
                 throw e
             }
+
+  fun <T> Nel<Option<T>>.flip(): Option<Nel<T>> =
+      this.sequence(Option.applicative()).fix()
 }
