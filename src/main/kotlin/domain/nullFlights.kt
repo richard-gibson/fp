@@ -1,9 +1,9 @@
-package error
+package domain
 
-import error.repository.flightManafests
-import error.repository.flights
-import error.repository.users
-import error.nullFlights.userFlights
+import domain.repository.flightManafests
+import domain.repository.flights
+import domain.repository.users
+import domain.nullFlights.userFlights
 
 object nullFlights {
 

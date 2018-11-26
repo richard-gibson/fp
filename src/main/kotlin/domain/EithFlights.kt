@@ -1,28 +1,23 @@
-package error
+package domain
 
-import error.repository.flightManafests
-import error.repository.flights
-import error.repository.users
+import domain.repository.flightManafests
+import domain.repository.flights
+import domain.repository.users
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.either.applicative.applicative
 import arrow.instances.either.monad.monad
 
-sealed class Failure
-data class NotFound(val msg: String) : Failure()
-data class FlightSystemException(val exception: Throwable) : Failure()
 
 object EithFlights {
-    data class EmptyReponseException(val msg: String) : Exception(msg)
 
-    fun <T, L> T?.toEither(ifEmpty: () -> L): Either<L, T> =
-            this?.right() ?: ifEmpty().left()
 
     fun <T> Nel<Either<Failure, T>>.flip(): Either<Failure, Nel<T>> =
             this.sequence(Either.applicative()).fix()
 
     fun userByName(name: String): Either<Failure, User> =
-            users.firstOrNull { it.name == name }.toEither { NotFound("no user id for $name") }
+            Option.fromNullable(users.firstOrNull { it.name == name })
+                    .toEither { NotFound("no user id for $name") }
 
     fun manifestsContainingUser(user: User): Either<Failure, Nel<FlightManafest>> =
             attemptFetchManafests(user)
@@ -35,7 +30,7 @@ object EithFlights {
             Try { flightManafests.filter { fm -> fm.passengers.contains(user.id) } }.toEither { FlightSystemException(it) }
 
     fun flightById(flightNo: Int): Either<Failure, Flight> =
-            flights.firstOrNull { it.flightNo == flightNo }
+            Option.fromNullable(flights.firstOrNull { it.flightNo == flightNo })
                     .toEither { NotFound("no flights for $flightNo") }
 
     fun flightsFromManifests(manifests: Nel<FlightManafest>): Either<Failure, Nel<Flight>> =
@@ -45,11 +40,11 @@ object EithFlights {
             Either.monad<Failure>().binding {
                 val user = userByName(name).bind()
                 val manifests = manifestsContainingUser(user).bind()
-                val tryFlights = manifests.map { flightById(it.flightNo) }
-                tryFlights.flip().bind()
+                val eithFlights = manifests.map { flightById(it.flightNo) }
+                eithFlights.flip().bind()
             }.fix()
 
-    fun userFlightsFM(name: String): Either<Failure, Nel<Flight>> =
+    fun userFlightsFlatMap(name: String): Either<Failure, Nel<Flight>> =
             userByName(name).flatMap { user ->
                 manifestsContainingUser(user).flatMap { manifests ->
                     manifests.map { flightById(it.flightNo) }.flip()

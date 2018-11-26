@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.10"
+    idea
+    id("org.jetbrains.kotlin.kapt") version "1.3.10"
 }
 
 group = "co.instil"
@@ -14,6 +16,7 @@ val arrowVersion = "0.8.2-SNAPSHOT"
 val kotlintestVersion = "2.0.7"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven(url = "https://oss.jfrog.org/oss-snapshot-local/")
 }
@@ -47,6 +50,29 @@ dependencies {
     testCompile(group = "io.arrow-kt",   name = "arrow-test",                           version = arrowVersion)
     testCompile(group = "io.kotlintest", name = "kotlintest",                           version = kotlintestVersion)
 
+}
+
+idea {
+    module {
+        sourceDirs + files(
+                "build/generated/source/kapt/main",
+                "build/generated/source/kapt/debug",
+                "build/generated/source/kapt/release",
+                "build/generated/source/kaptKotlin/main",
+                "build/generated/source/kaptKotlin/debug",
+                "build/generated/source/kaptKotlin/release",
+                "build/tmp/kapt/main/kotlinGenerated"
+        )
+        generatedSourceDirs + files(
+                "build/generated/source/kapt/main",
+                "build/generated/source/kapt/debug",
+                "build/generated/source/kapt/release",
+                "build/generated/source/kaptKotlin/main",
+                "build/generated/source/kaptKotlin/debug",
+                "build/generated/source/kaptKotlin/release",
+                "build/tmp/kapt/main/kotlinGenerated"
+        )
+    }
 }
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"

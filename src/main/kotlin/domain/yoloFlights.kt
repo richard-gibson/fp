@@ -1,9 +1,9 @@
-package error
+package domain
 
-import error.repository.flightManafests
-import error.repository.flights
-import error.repository.users
-import error.yoloFlights.userFlights
+import domain.repository.flightManafests
+import domain.repository.flights
+import domain.repository.users
+import domain.yoloFlights.userFlights
 
 object yoloFlights {
     fun userByName(name: String): User =

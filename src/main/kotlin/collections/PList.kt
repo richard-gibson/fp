@@ -1,7 +1,5 @@
 package collections
 
-import arrow.core.identity
-
 sealed class PList<out A> {
     abstract fun isEmpty(): Boolean
     abstract fun head(): A
@@ -11,7 +9,7 @@ sealed class PList<out A> {
         operator fun <A> invoke(x: A, xs: PList<A> = Nil): PList<A> = Cons(x, xs)
         operator fun <A> invoke(vararg a: A) = fromArr(a)
 
-        private fun <A> fromList(l: List<A>): PList<A> =
+        fun <A> fromList(l: List<A>): PList<A> =
                 if (l.isEmpty()) Nil
                 else Cons(l[0], fromList(l.drop(1)))
 
@@ -39,19 +37,26 @@ data class Cons<A>(val head: A, val tail: PList<A>) : PList<A>() {
 }
 
 //ListOps
+
+fun <A> PList<A>.setHead(x: A): PList<A> = Cons(x, tail())
+
+fun <A> PList<A>.setTail(xs: PList<A>): PList<A> = Cons(head(), xs)
+
 fun <A, B> PList<A>.fold(empty: (PList<A>) -> B, notEmpty: (PList<A>) -> B): B =
         when (this) {
             is Nil -> empty(this)
             is Cons -> notEmpty(this)
         }
 
-infix fun <A> A.prep(xs: PList<A>): PList<A> = Cons(this, xs)
+fun <A> PList<A>.length(): Int = fold({ 0 }, { 1 + tail().length() })
+
+infix fun <A> A.prepend(xs: PList<A>): PList<A> = Cons(this, xs)
 
 infix fun <A> PList<A>.join(xs: PList<A>): PList<A> =
         fold({ xs }, { Cons(head(), tail() join xs) })
 
-infix fun <A> PList<A>.app(a: A): PList<A> =
-        this join PList(a)
+infix fun <A> PList<A>.append(x: A): PList<A> =
+        this join PList(x)
 
 fun <A, B> PList<A>.map(f: (A) -> B): PList<B> =
         fold({ Nil }, { Cons(f(head()), tail().map(f)) })
@@ -64,8 +69,7 @@ fun <A, B> PList<A>.foldLeft(acc: B, f: (B, A) -> B): B =
         fold({ acc }, { tail().foldLeft(f(acc, head()), f) })
 
 fun <A> PList<PList<A>>.flatten(): PList<A> =
-        flatMap(::identity)
-//        fold({ Nil }, { head() join tail().flatten() })
+        fold({ Nil }, { head() join tail().flatten() })
 
 fun <A, B> PList<A>.foldRight(acc: B, f: (B, A) -> B): B =
         fold({ acc }, { f(tail().foldRight(acc, f), head()) })
@@ -86,11 +90,45 @@ fun <A> PList<A>.filterNot(pred: (A) -> Boolean): PList<A> =
             else acc
         }
 
+fun <A> PList<A>.zip(other: PList<A>): PList<Pair<A, A>> {
+    fun _zip(left: PList<A>, right: PList<A>, acc: PList<Pair<A, A>>): PList<Pair<A, A>> =
+            if (left == Nil || right == Nil)
+                acc
+            else
+                _zip(left.tail(), right.tail(),
+                        acc append (left.head() to right.head())
+                )
+    return _zip(this, other, Nil)
+}
+
+
 fun <A> PList<A>.partition(pred: (A) -> Boolean): Pair<PList<A>, PList<A>> =
         foldRight(Pair(PList.empty(), PList.empty())) { (pos, neg), e ->
             if (pred(e)) Cons(e, pos) to neg
             else pos to Cons(e, neg)
         }
+
+
+fun <A> PList<A>.takeN(n: Int): PList<A> =
+        fold({ Nil }, {
+            if (n > 0) head() prepend tail().takeN(n - 1)
+            else Nil
+        })
+
+fun <A> PList<A>.takeWhile(pred: (A) -> Boolean): PList<A> =
+        fold({ Nil }, {
+            if (pred(head())) head() prepend tail().takeWhile(pred)
+            else Nil
+        })
+
+fun <A> PList<A>.dropN(n: Int): PList<A> =
+        fold({ Nil }, {
+            if (n > 0) tail().dropN(n - 1)
+            else this
+        })
+
+fun <A> PList<A>.splitAt(n: Int): Pair<PList<A>, PList<A>> =
+        (takeN(n) to dropN(n))
 
 fun <A> PList<A>.dropWhile(pred: (A) -> Boolean): PList<A> =
         fold({ Nil }, {
@@ -98,75 +136,13 @@ fun <A> PList<A>.dropWhile(pred: (A) -> Boolean): PList<A> =
             else this
         })
 
-
-/**
- *
-def splitAt(n: Int): (IList[A], IList[A]) = {
-@tailrec def splitAt0(n: Int, as: IList[A], accum: IList[A]): (IList[A], IList[A]) =
-if (n < 1) (accum.reverse, as) else as match {
-case INil() => (this, empty)
-case ICons(h, t) => splitAt0(n - 1, t, h :: accum)
-}
-splitAt0(n, this, empty)
-}
- */
-fun <A> PList<A>.splitAt(i: Int): Pair<PList<A>, PList<A>> {
-    fun _splitAt(n: Int, dec: PList<A>, acc: PList<A>) {
-        if (n < 1) dec to acc
-        else when (dec) {
-            is Nil -> (this to Nil)
+fun <A> PList<A>.hashcode(): Int =
+        foldLeft(0) { acc, elem ->
+            acc + elem.hashCode()
         }
-    }
-    return TODO()
-}
 
+fun <A> PList<A>.equals(other: PList<A>) =
+        this.length() == other.length() &&
+                this.hashCode() == other.hashCode()
 
-fun main(a: Array<String>) {
-
-    val l1: PList<String> = PList("bar", "baz")
-    val l2: PList<String> = PList("foo", "bar", "baz")
-    val l3: PList<String> = PList.empty()
-
-
-    println(l1 app "box")
-    println(l1 join l2)
-
-    println(l1 join l3)
-    println(l3 join l2)
-
-    val l4 = PList(1, 2, 3, 4)
-    println(l4)
-    println(l4.map { x -> x + 1 })
-    println(l4.reverse())
-
-
-    println(l2.foldLeft("") { acc, e ->
-        "$acc, $e"
-    })
-
-    println(l2.foldRight("") { acc, e ->
-        "$acc, $e"
-    })
-
-    println(l2.reverse())
-
-
-    val dropped = l4.dropWhile { it % 2 == 1 }
-    val evens = l4.filter { it % 2 == 0 }
-    val odds = l4.filterNot { it % 2 == 0 }
-    val split = l4.partition { it % 2 == 0 }
-
-    println(dropped)
-    println(evens)
-    println(odds)
-    println(split)
-    println(split == (evens to odds))
-    println("appends ${evens join odds}")
-
-    println(l4.map { PList(it) }.flatten())
-    println(l4.flatMap { PList(it) })
-    println(l4.map { PList(it) }.flatten() == l4.flatMap { PList(it) })
-    println(l4)
-
-}
 

@@ -23,7 +23,7 @@ interface Sleep<F> {
 }
 
 
-class AsyncCakeService<F>(val A: Async<F>, val S: Sleep<F>): Async<F> by A, Sleep<F> by S {
+class AsyncCakeService<F>(val A: Async<F>, S: Sleep<F>): Async<F> by A, Sleep<F> by S {
 
     fun retrieveFlour(weight: Int): Kind<F, Flour> =
             delay {

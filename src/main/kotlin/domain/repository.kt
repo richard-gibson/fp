@@ -1,4 +1,4 @@
-package error
+package domain
 
 import arrow.core.some
 import arrow.data.k
@@ -26,4 +26,11 @@ object repository {
             FlightManafest(10567, listOf(1, 2)),
             FlightManafest(10023, listOf(1))
     ).k()
+
+
+
+    val zips = listOf("10002", "10005", "10022")
+    val cities = listOf("Dublin", "London", "Madrid")
 }
+
+

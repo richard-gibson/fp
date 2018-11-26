@@ -1,8 +1,8 @@
-package error
+package domain
 
-import error.repository.flightManafests
-import error.repository.flights
-import error.repository.users
+import domain.repository.flightManafests
+import domain.repository.flights
+import domain.repository.users
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.option.applicative.applicative
@@ -11,13 +11,13 @@ import arrow.instances.option.monad.binding
 object OptFlights {
 
     fun userByName(name: String): Option<User> =
-            users.firstOrNull { it.name == name }.toOption()
+            Option.fromNullable(users.firstOrNull { it.name == name })
 
     fun manifestsContainingUser(user: User): Option<Nel<FlightManafest>> =
             Nel.fromList(flightManafests.filter { fm -> fm.passengers.contains(user.id) })
 
     fun flightById(flightNo: Int): Option<Flight> =
-            flights.firstOrNull { it.flightNo == flightNo }.toOption()
+            Option.fromNullable(flights.firstOrNull { it.flightNo == flightNo })
 
   fun userFlightsFlatMap(name:String): Option<Nel<Flight>> =
       try {
