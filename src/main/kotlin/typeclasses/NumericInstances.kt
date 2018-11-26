@@ -1,6 +1,5 @@
 package numeric.instances
 
-import arrow.extension
 import typeclasses.Numeric
 
 fun Int.Companion.numeric() = object : Numeric<Int> {

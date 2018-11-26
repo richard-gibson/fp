@@ -8,7 +8,9 @@ import arrow.data.*
 import arrow.instances.either.applicative.applicative
 import arrow.instances.either.monad.monad
 
-
+/**
+ * Take null flights implementation and refactor to use Either
+ */
 object EithFlights {
 
 

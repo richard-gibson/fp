@@ -1,5 +1,9 @@
 package json
 
+
+/**
+ * create an algebraic data type to represent Json
+ */
 sealed class Json {
     companion object
 }
@@ -22,7 +26,9 @@ class JsNull: Json() {
     companion object
 }
 
-
+/**
+ * create a stringify extension function that produces valid JSON in String format
+ */
 fun Json.stringify(): String = when(this) {
     is JsString  -> "\"$value\""
     is JsNumber  -> value.toString()

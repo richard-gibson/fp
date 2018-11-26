@@ -7,6 +7,10 @@ import generators.genPList
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+
+//Implement the following laws
+// Think of another law that could be used for PList
+
 class PListLaws : UnitSpec() {
 
     val reverseLaw = Law("a list reversed twice should equal the original list") {

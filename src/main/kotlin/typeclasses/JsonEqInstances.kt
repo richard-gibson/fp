@@ -11,6 +11,9 @@ import json.instances.jsnull.eq.eq
 import json.instances.jsobject.eq.eq
 import json.instances.json.eq.eq
 
+/**
+ * create a Eq<Json> instance
+ */
 @extension
 interface JsStringEq: Eq<JsString> {
     override fun JsString.eqv(b: JsString): Boolean =

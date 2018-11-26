@@ -15,6 +15,9 @@ import arrow.instances.either.monadError.monadError
 import arrow.instances.option.monadError.monadError
 import arrow.typeclasses.MonadError
 
+/**
+ * Take Try flights implementation and refactor to use MonadError
+ */
 class MEFlights<F, E>(val ME: MonadError<F, E>, val FunctK: FunctionK<ForOption, F>) :
         MonadError<F, E> by ME {
 

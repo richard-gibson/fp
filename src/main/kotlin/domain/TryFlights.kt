@@ -9,6 +9,9 @@ import arrow.data.*
 import arrow.instances.`try`.applicative.applicative
 import arrow.instances.`try`.monad.binding
 
+/**
+ * Take null flights implementation and refactor to use Try
+ */
 object TryFlights {
 
     fun <T> Option<T>.toTry(ifEmpty: () -> Throwable): Try<T> =

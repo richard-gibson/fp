@@ -152,36 +152,3 @@ fun <T> runDeferred(df: Kind<ForDeferredK, T>): Try<T> = df.fix().unsafeAttemptS
 fun <T> runObsK(obs: Kind<ForObservableK, T>): Try<T> = Try { obs.fix().value().blockingFirst() }
 fun <T> runFlux(flux: Kind<ForFluxK, T>): Try<T> = Try { flux.fix().value().blockFirst() }
 
-fun main(args: Array<String>) {
-    val DfkModule = CakeModule(DeferredK.async(), DeferredKSleep())
-    with(DfkModule) {
-
-        runTiming("coroutines deferredCake") { runDeferred(cakeAttempts.deferredCake()) }
-        runTiming("coroutines deferredBadCake") { runDeferred(cakeAttempts.deferredBadCake()) }
-        runTiming("coroutines resilientCake") { runDeferred(cakeAttempts.resilientCake()) }
-        runTiming("coroutines parCake") { runDeferred(cakeAttempts.parCake()) }
-    }
-
-    val ObskModule = CakeModule(ObservableK.async(), ObservableKSleep)
-
-    with(ObskModule) {
-
-        runTiming("RX deferredCake") { runObsK(cakeAttempts.deferredCake()) }
-        runTiming("RX deferredBadCake") { runObsK(cakeAttempts.deferredBadCake()) }
-        runTiming("RX resilientCake") { runObsK(cakeAttempts.resilientCake()) }
-        runTiming("RX parCake") { runObsK(cakeAttempts.parCake()) }
-    }
-
-    val FluxkModule = CakeModule(FluxK.async(), FluxKSleep)
-
-    with(FluxkModule) {
-
-        runTiming("Flux deferredCake") { runFlux(cakeAttempts.deferredCake()) }
-        runTiming("Flux deferredBadCake") { runFlux(cakeAttempts.deferredBadCake()) }
-        runTiming("Flux resilientCake") { runFlux(cakeAttempts.resilientCake()) }
-        runTiming("Flux parCake") { runFlux(cakeAttempts.parCake()) }
-    }
-
-
-
-}

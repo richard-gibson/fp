@@ -8,6 +8,9 @@ import arrow.data.*
 import arrow.instances.option.applicative.applicative
 import arrow.instances.option.monad.binding
 
+/**
+ * Take null flights implementation and refactor to use Option
+ */
 object OptFlights {
 
     fun userByName(name: String): Option<User> =

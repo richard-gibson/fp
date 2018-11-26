@@ -11,9 +11,9 @@ import json.instances.jsobject.show.show
 import json.instances.json.show.show
 import json.instances.jsstring.show.show
 
-
-
-
+/**
+ * create a Show<Json> instance
+ */
 @extension
 interface JsStringShow: Show<JsString> {
     override fun JsString.show(): String =

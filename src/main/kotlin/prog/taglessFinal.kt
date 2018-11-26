@@ -2,7 +2,6 @@ package prog.tagless
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.effects.IO
 import arrow.effects.fix
 import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.MonadDefer
@@ -39,28 +38,21 @@ interface Console<F> {
     fun getStrLn(): Kind<F, String>
 }
 
-class ConsoleInstance<F>(val delay: MonadDefer<F>) : Console<F> {
-    override fun putStrLn(s: String): Kind<F, Unit> = delay { println(s) }
-    override fun getStrLn(): Kind<F, String> = delay { readLine().orEmpty() }
+class ConsoleInstance<F>(val MD: MonadDefer<F>) : Console<F> {
+    override fun putStrLn(s: String): Kind<F, Unit> = MD.delay { println(s) }
+    override fun getStrLn(): Kind<F, String> =  MD.delay { readLine().orEmpty() }
 }
 
 interface FRandom<F> {
     fun nextInt(upper: Int): Kind<F, Int>
 }
 
-class FRandomInstance<F>(val delay: MonadDefer<F>) : FRandom<F> {
-    override fun nextInt(upper: Int): Kind<F, Int> = delay { ORandom.nextInt(upper) }
+class FRandomInstance<F>(val MD: MonadDefer<F>) : FRandom<F> {
+    override fun nextInt(upper: Int): Kind<F, Int> =  MD.delay { ORandom.nextInt(upper) }
 }
 
 class MonadConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Monad<F> by M, Console<F> by C, FRandom<F> by R
-/***
- * TODO
- *  - Create TestIO
- *  - fix parseInt error scenario
- *  - move when branches to separate functions
- *  - try to make when return Kind<F, List>
- *  - move state??
- */
+
 object tagless {
 
     fun parseInt(s: String): Try<Int> = Try { s.toInt() }
@@ -129,13 +121,4 @@ object tagless {
     fun <F> MonadConsoleRandom<F>.fMain(): Kind<F, Unit> = binding {
         commandLoop(emptyList()).bind()
     }
-}
-
-fun main(args: Array<String>) {
-    val effectModule = IO.monadDefer()
-    val mcr = MonadConsoleRandom(effectModule,
-            ConsoleInstance(effectModule),
-            FRandomInstance(effectModule))
-    val prog = mcr.fMain().fix()
-    prog.unsafeRunSync()
 }
